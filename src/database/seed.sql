@@ -1,6 +1,3 @@
--- src/database/seed.sql
-
--- Only add weight classes if they don't already exist
 INSERT INTO weight_classes (id, name, weight_limit, gender)
 SELECT 13, 'Flyweight', 125.00, 'Male'
     WHERE NOT EXISTS (SELECT 1 FROM weight_classes WHERE id = 13);
@@ -49,7 +46,6 @@ INSERT INTO weight_classes (id, name, weight_limit, gender)
 SELECT 24, 'Women''s Featherweight', 145.00, 'Female'
     WHERE NOT EXISTS (SELECT 1 FROM weight_classes WHERE id = 24);
 
--- Add fighters with correct weight_class_id references
 INSERT INTO fighters (first_name, last_name, weight_class_id, nationality, team, wins, losses, knockouts, submissions)
 SELECT 'Deiveson', 'Figueiredo', 13, 'Brazil', 'Team Figueiredo', 21, 2, 9, 8
     WHERE NOT EXISTS (SELECT 1 FROM fighters WHERE first_name = 'Deiveson' AND last_name = 'Figueiredo');
@@ -66,7 +62,6 @@ INSERT INTO fighters (first_name, last_name, weight_class_id, nationality, team,
 SELECT 'Askar', 'Askarov', 13, 'Russia', 'Berkut MMA', 14, 1, 3, 8
     WHERE NOT EXISTS (SELECT 1 FROM fighters WHERE first_name = 'Askar' AND last_name = 'Askarov');
 
--- Bantamweight
 INSERT INTO fighters (first_name, last_name, weight_class_id, nationality, team, wins, losses, knockouts, submissions)
 SELECT 'Aljamain', 'Sterling', 14, 'United States', 'Serra-Longo Fight Team', 22, 3, 3, 8
     WHERE NOT EXISTS (SELECT 1 FROM fighters WHERE first_name = 'Aljamain' AND last_name = 'Sterling');
@@ -83,7 +78,6 @@ INSERT INTO fighters (first_name, last_name, weight_class_id, nationality, team,
 SELECT 'Marlon', 'Vera', 14, 'Ecuador', 'Team Oyama', 20, 8, 8, 9
     WHERE NOT EXISTS (SELECT 1 FROM fighters WHERE first_name = 'Marlon' AND last_name = 'Vera');
 
--- Featherweight
 INSERT INTO fighters (first_name, last_name, weight_class_id, nationality, team, wins, losses, knockouts, submissions)
 SELECT 'Alexander', 'Volkanovski', 15, 'Australia', 'City Kickboxing', 25, 2, 12, 3
     WHERE NOT EXISTS (SELECT 1 FROM fighters WHERE first_name = 'Alexander' AND last_name = 'Volkanovski');
@@ -100,7 +94,6 @@ INSERT INTO fighters (first_name, last_name, weight_class_id, nationality, team,
 SELECT 'Yair', 'Rodriguez', 15, 'Mexico', 'Striking MMA', 14, 4, 5, 3
     WHERE NOT EXISTS (SELECT 1 FROM fighters WHERE first_name = 'Yair' AND last_name = 'Rodriguez');
 
--- Lightweight
 INSERT INTO fighters (first_name, last_name, weight_class_id, nationality, team, wins, losses, knockouts, submissions)
 SELECT 'Islam', 'Makhachev', 16, 'Russia', 'Eagle MMA', 23, 1, 4, 10
     WHERE NOT EXISTS (SELECT 1 FROM fighters WHERE first_name = 'Islam' AND last_name = 'Makhachev');
@@ -117,7 +110,6 @@ INSERT INTO fighters (first_name, last_name, weight_class_id, nationality, team,
 SELECT 'Justin', 'Gaethje', 16, 'United States', 'ONX Sports', 24, 4, 19, 1
     WHERE NOT EXISTS (SELECT 1 FROM fighters WHERE first_name = 'Justin' AND last_name = 'Gaethje');
 
--- Welterweight
 INSERT INTO fighters (first_name, last_name, weight_class_id, nationality, team, wins, losses, knockouts, submissions)
 SELECT 'Leon', 'Edwards', 17, 'United Kingdom', 'UTC', 20, 3, 7, 3
     WHERE NOT EXISTS (SELECT 1 FROM fighters WHERE first_name = 'Leon' AND last_name = 'Edwards');
@@ -134,7 +126,6 @@ INSERT INTO fighters (first_name, last_name, weight_class_id, nationality, team,
 SELECT 'Belal', 'Muhammad', 17, 'United States', 'Roufusport', 22, 3, 5, 1
     WHERE NOT EXISTS (SELECT 1 FROM fighters WHERE first_name = 'Belal' AND last_name = 'Muhammad');
 
--- Add events
 INSERT INTO events (name, date, location, venue)
 SELECT 'UFC 290', '2023-07-08', 'Las Vegas, Nevada', 'T-Mobile Arena'
     WHERE NOT EXISTS (SELECT 1 FROM events WHERE name = 'UFC 290');
@@ -159,12 +150,9 @@ INSERT INTO events (name, date, location, venue)
 SELECT 'UFC 300', '2024-04-13', 'Las Vegas, Nevada', 'T-Mobile Arena'
     WHERE NOT EXISTS (SELECT 1 FROM events WHERE name = 'UFC 300');
 
--- Add simple fights (avoiding complex PL/pgSQL blocks)
--- First get the fighter IDs
 CREATE TEMPORARY TABLE IF NOT EXISTS fighter_ids AS
 SELECT id, first_name, last_name FROM fighters;
 
--- Add UFC 290 fight: Figueiredo vs Moreno
 INSERT INTO fights (event_id, fighter1_id, fighter2_id, winner_id, result_type, round, time)
 SELECT
     (SELECT id FROM events WHERE name = 'UFC 290'),
@@ -185,7 +173,6 @@ SELECT
             f2.first_name = 'Brandon' AND f2.last_name = 'Moreno'
     );
 
--- Add UFC 292 fight: Sterling vs O'Malley
 INSERT INTO fights (event_id, fighter1_id, fighter2_id, winner_id, result_type, round, time)
 SELECT
     (SELECT id FROM events WHERE name = 'UFC 292'),
@@ -206,7 +193,6 @@ SELECT
             f2.first_name = 'Sean' AND f2.last_name = 'O''Malley'
     );
 
--- Add UFC 291 fight: Makhachev vs Oliveira
 INSERT INTO fights (event_id, fighter1_id, fighter2_id, winner_id, result_type, round, time)
 SELECT
     (SELECT id FROM events WHERE name = 'UFC 291'),
@@ -227,7 +213,6 @@ SELECT
             f2.first_name = 'Charles' AND f2.last_name = 'Oliveira'
     );
 
--- Add simple rankings
 INSERT INTO rankings (fighter_id, weight_class_id, rank, updated_at)
 SELECT
     (SELECT id FROM fighter_ids WHERE first_name = 'Brandon' AND last_name = 'Moreno'),
@@ -270,5 +255,4 @@ SELECT
         WHERE f.first_name = 'Islam' AND f.last_name = 'Makhachev'
     );
 
--- Clean up temporary tables
 DROP TABLE IF EXISTS fighter_ids;
